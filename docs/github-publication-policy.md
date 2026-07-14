@@ -12,6 +12,8 @@
 4. tag 与 Release 均不存在；发布器创建 Draft、上传并回读校验全部资产后才转为公开；
 5. 任一冲突或校验失败均失败关闭，既有 tag、资产或 Release 不得覆盖；
 6. macOS 公共二进制必须使用 Developer ID 签名并通过 Apple 公证；`adhoc` 构建只用于本机验收。
+   个人 1.0 的正式签名走本机流程，授权记录还必须引用绑定干净源码 commit/ref/version、Apple
+   提交结果及最终 artifact SHA-256 的 provenance；单一账号不得启用 Actions 自批作为替代。
 
 仓库保护建议：默认分支要求 CI 通过和 CODEOWNER 审核；禁用强制推送与分支删除；启用秘密扫描、
 依赖告警以及 GitHub 提供的 Release immutability。仓库创建后使用以下命令启用并验证：

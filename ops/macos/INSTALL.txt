@@ -1,22 +1,28 @@
-Personal Skill Hub CLI 0.1.0
-================================
+Personal Skill Hub CLI
+======================
 
 Supported system: macOS 13 or later on Apple Silicon (arm64).
 
-1. Verify the ZIP against the adjacent .sha256 file:
+1. Verify the downloaded ZIP or DMG against its adjacent .sha256 file (run the
+   command matching the artifact you downloaded):
 
-   shasum -a 256 -c skillctl-*.zip.sha256
+   shasum -a 256 -c skillctl-*-macos13-arm64.zip.sha256
+   shasum -a 256 -c skillctl-*-macos13-arm64.dmg.sha256
 
-2. Unzip it and move the executable into a directory on PATH:
+2. For a ZIP, unpack it and move the versioned executable into a directory on PATH:
 
-   unzip skillctl-*.zip
-   sudo install -m 0755 skillctl-0.1.0-macos13-arm64/skillctl /usr/local/bin/skillctl
+   unzip skillctl-*-macos13-arm64.zip
+   sudo install -m 0755 skillctl-*-macos13-arm64/skillctl /usr/local/bin/skillctl
+
+   For a DMG, open the verified disk image and install `skillctl` from its
+   `skillctl-<version>-macos13-arm64` folder into `/usr/local/bin` in the same way.
 
 3. Confirm the client:
 
    skillctl --version
    skillctl doctor
 
-Public distribution must use a Developer ID-signed and Apple-notarized build. The build scripts
-add `-adhoc` or `-signed-unnotarized` to incomplete artifacts. Only the notarization script creates
-the suffix-free ZIP eligible for an official Release.
+Public distribution must use a Developer ID-signed and Apple-notarized suffix-free artifact. The
+build scripts add `-adhoc` or `-signed-unnotarized` to incomplete artifacts. A ZIP uses Apple's
+online notarization ticket because ZIP archives cannot be stapled. The optional official DMG is
+signed, notarized, and stapled. Never disable Gatekeeper or remove quarantine to install skillctl.

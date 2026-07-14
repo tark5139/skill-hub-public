@@ -1,0 +1,37 @@
+{
+  "version": "2.0",
+  "statement": [
+    {
+      "effect": "allow",
+      "action": [
+        "name/cos:GetObject",
+        "name/cos:HeadObject",
+        "name/cos:PutObject",
+        "name/cos:DeleteObject"
+      ],
+      "resource": [
+        "qcs::cos:ap-shanghai:uid/REPLACE_APPID:REPLACE_QUARANTINE_BUCKET_WITH_APPID/*"
+      ]
+    },
+    {
+      "effect": "allow",
+      "action": [
+        "name/cos:GetObject",
+        "name/cos:HeadObject",
+        "name/cos:PutObject"
+      ],
+      "resource": [
+        "qcs::cos:ap-shanghai:uid/REPLACE_APPID:REPLACE_RELEASE_BUCKET_WITH_APPID/*"
+      ]
+    },
+    {
+      "effect": "deny",
+      "action": [
+        "name/cos:DeleteObject"
+      ],
+      "resource": [
+        "qcs::cos:ap-shanghai:uid/REPLACE_APPID:REPLACE_RELEASE_BUCKET_WITH_APPID/*"
+      ]
+    }
+  ]
+}

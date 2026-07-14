@@ -1,0 +1,3 @@
+# One uppercase GPG primary-key or signing-subkey fingerprint per line.
+# Obtain this value through an independently verified release-key ceremony.
+REPLACE_WITH_40_OR_64_HEX_GPG_FINGERPRINT
