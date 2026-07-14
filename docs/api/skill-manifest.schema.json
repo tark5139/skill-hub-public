@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://skill-hub.local/schemas/skill-manifest-v1.json",
+  "title": "Skill Hub immutable manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "namespace",
+    "name",
+    "version",
+    "description",
+    "compatibility",
+    "files",
+    "artifact_sha256",
+    "license",
+    "signatures",
+    "scan_status",
+    "created_at"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "namespace": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,62}$" },
+    "name": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{0,62}$" },
+    "version": { "type": "string", "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?$" },
+    "description": { "type": "string", "minLength": 1, "maxLength": 4096 },
+    "compatibility": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true,
+      "maxItems": 32
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "size", "sha256", "media_type"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "size": { "type": "integer", "minimum": 0 },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "media_type": { "type": "string" }
+        }
+      }
+    },
+    "artifact_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "source": { "type": ["object", "null"] },
+    "license": { "type": "string", "minLength": 1 },
+    "signatures": { "type": "array", "items": { "type": "object" } },
+    "scan_status": { "enum": ["passed", "passed_with_warnings"] },
+    "created_at": { "type": "string", "format": "date-time" }
+  }
+}

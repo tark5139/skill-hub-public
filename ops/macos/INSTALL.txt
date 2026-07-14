@@ -1,0 +1,22 @@
+Personal Skill Hub CLI 0.1.0
+================================
+
+Supported system: macOS 13 or later on Apple Silicon (arm64).
+
+1. Verify the ZIP against the adjacent .sha256 file:
+
+   shasum -a 256 -c skillctl-*.zip.sha256
+
+2. Unzip it and move the executable into a directory on PATH:
+
+   unzip skillctl-*.zip
+   sudo install -m 0755 skillctl-0.1.0-macos13-arm64/skillctl /usr/local/bin/skillctl
+
+3. Confirm the client:
+
+   skillctl --version
+   skillctl doctor
+
+Public distribution must use a Developer ID-signed and Apple-notarized build. The build scripts
+add `-adhoc` or `-signed-unnotarized` to incomplete artifacts. Only the notarization script creates
+the suffix-free ZIP eligible for an official Release.

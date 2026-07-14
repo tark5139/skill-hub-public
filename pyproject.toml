@@ -1,0 +1,62 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "personal-skill-hub"
+version = "0.1.0"
+description = "A private-first, immutable Skill registry and multi-agent installer."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "tark5139" }]
+dependencies = [
+  "alembic>=1.14,<2",
+  "boto3>=1.35,<2",
+  "cryptography>=44,<47",
+  "fastapi>=0.115,<1",
+  "httpx>=0.28,<1",
+  "packaging>=24,<27",
+  "psycopg[binary]>=3.2,<4",
+  "pydantic-settings>=2.7,<3",
+  "python-multipart>=0.0.20,<1",
+  "PyYAML>=6.0,<7",
+  "sqlalchemy>=2.0,<3",
+  "typer>=0.15,<1",
+  "uvicorn[standard]>=0.34,<1",
+]
+
+[project.urls]
+Repository = "https://github.com/tark5139/skill-hub-public"
+Documentation = "https://github.com/tark5139/skill-hub-public/tree/main/docs"
+Issues = "https://github.com/tark5139/skill-hub-public/issues"
+
+[project.optional-dependencies]
+dev = [
+  "build>=1.2,<2",
+  "pyinstaller>=6.11,<7; sys_platform == 'darwin' and platform_machine == 'arm64'",
+  "pytest>=8.3,<9",
+  "pytest-cov>=6,<8",
+  "ruff>=0.9,<1",
+]
+
+[project.scripts]
+skillhub-api = "skillhub.main:run"
+skillhub-worker = "skillhub.worker:run"
+skillctl = "skillhub_cli.main:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/skillhub", "src/skillhub_cli"]
+
+[tool.pytest.ini_options]
+addopts = "-q --disable-warnings --strict-markers"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["B008"]

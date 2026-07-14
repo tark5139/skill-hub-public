@@ -1,0 +1,146 @@
+name: personal-skill-hub
+
+x-skillhub-common: &skillhub-common
+  build:
+    context: .
+  image: personal-skill-hub:0.1.0
+  env_file:
+    - .env
+  environment: &skillhub-environment
+    SKILLHUB_ENV: production
+    SKILLHUB_DATABASE_URL: ${SKILLHUB_DATABASE_URL:?set SKILLHUB_DATABASE_URL in .env}
+    SKILLHUB_STORAGE_BACKEND: s3
+    SKILLHUB_S3_ENDPOINT_URL: ${SKILLHUB_S3_ENDPOINT_URL:-https://cos.ap-shanghai.myqcloud.com}
+    SKILLHUB_S3_REGION: ap-shanghai
+    SKILLHUB_S3_QUARANTINE_BUCKET: ${SKILLHUB_S3_QUARANTINE_BUCKET:?set a COS bucket including APPID}
+    SKILLHUB_S3_RELEASE_BUCKET: ${SKILLHUB_S3_RELEASE_BUCKET:?set a COS bucket including APPID}
+    SKILLHUB_S3_ACCESS_KEY_ID: ${SKILLHUB_S3_ACCESS_KEY_ID:?inject a least-privilege credential}
+    SKILLHUB_S3_SECRET_ACCESS_KEY: ${SKILLHUB_S3_SECRET_ACCESS_KEY:?inject a least-privilege credential}
+    SKILLHUB_REQUIRE_SIGNATURE: "true"
+    SKILLHUB_TRUSTED_PUBLIC_KEYS_JSON: ${SKILLHUB_TRUSTED_PUBLIC_KEYS_JSON:?set trusted Ed25519 public keys}
+    SKILLHUB_GITHUB_OWNER: ${SKILLHUB_GITHUB_OWNER:-tark5139}
+    SKILLHUB_GITHUB_REPOSITORY: ${SKILLHUB_GITHUB_REPOSITORY:-skill-hub-public}
+    SKILLHUB_GITHUB_APPROVER: ${SKILLHUB_GITHUB_APPROVER:-tark5139}
+    SKILLHUB_GITHUB_TOKEN: ${SKILLHUB_GITHUB_TOKEN:-}
+  restart: unless-stopped
+  read_only: true
+  tmpfs:
+    - /tmp:size=128m,mode=1777
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  depends_on:
+    postgres:
+      condition: service_healthy
+  networks:
+    - backend
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-skillhub}
+      POSTGRES_USER: ${POSTGRES_USER:-skillhub}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set a random database password in .env}
+      POSTGRES_INITDB_ARGS: --data-checksums
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    shm_size: 256mb
+    networks:
+      - backend
+    security_opt:
+      - no-new-privileges:true
+    # No host port: PostgreSQL is reachable only from the private Compose network.
+
+  migrate:
+    <<: *skillhub-common
+    command:
+      - alembic
+      - upgrade
+      - head
+    restart: "no"
+
+  api:
+    <<: *skillhub-common
+    command:
+      - skillhub-api
+    environment:
+      <<: *skillhub-environment
+      SKILLHUB_PUBLIC_BASE_URL: ${SKILLHUB_PUBLIC_BASE_URL:?set the HTTPS public URL}
+    expose:
+      - "8080"
+    ports:
+      - 127.0.0.1:${SKILLHUB_API_PORT:-8080}:8080
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - >-
+          import urllib.request;
+          urllib.request.urlopen('http://127.0.0.1:8080/health/ready', timeout=3).read()
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  worker:
+    <<: *skillhub-common
+    command:
+      - skillhub-worker
+    environment:
+      <<: *skillhub-environment
+      SKILLHUB_PUBLIC_BASE_URL: ${SKILLHUB_PUBLIC_BASE_URL:?set the HTTPS public URL}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  caddy:
+    image: caddy:2.10-alpine
+    profiles:
+      - https
+    restart: unless-stopped
+    environment:
+      SKILLHUB_DOMAIN: ${SKILLHUB_DOMAIN:?set the already-ICP-filed API domain}
+    ports:
+      - 80:80
+      - 443:443
+      - 443:443/udp
+    volumes:
+      - ./ops/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - backend
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    security_opt:
+      - no-new-privileges:true
+    depends_on:
+      api:
+        condition: service_healthy
+
+networks:
+  backend:
+    driver: bridge
+    internal: false
+
+volumes:
+  postgres_data:
+  caddy_data:
+  caddy_config:

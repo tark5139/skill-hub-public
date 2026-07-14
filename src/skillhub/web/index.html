@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>Personal Skill Hub</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">S</div>
+          <div><strong>Skill Hub</strong><span>Personal 1.0</span></div>
+        </div>
+        <nav aria-label="主导航">
+          <button class="nav-item active" data-view="registry"><span>▦</span>技能仓库</button>
+          <button class="nav-item" data-view="publishing"><span>↥</span>发布中心</button>
+          <button class="nav-item" data-view="integrations"><span>⌘</span>Agent 集成</button>
+          <button class="nav-item" data-view="settings"><span>⚙</span>系统设置</button>
+        </nav>
+        <div class="sidebar-foot">
+          <div id="health-chip" class="health-chip"><i></i><span>正在检查服务</span></div>
+          <div class="identity"><span class="avatar">T</span><div><b id="identity-name">未登录</b><small>上海 · Personal</small></div></div>
+        </div>
+      </aside>
+
+      <main>
+        <header class="topbar">
+          <div><p class="eyebrow">PRIVATE REGISTRY</p><h1 id="view-title">技能仓库</h1></div>
+          <div class="top-actions">
+            <label class="search"><span>⌕</span><input id="search-input" type="search" placeholder="搜索技能、说明或命名空间" /></label>
+            <button id="refresh-button" class="button ghost">刷新</button>
+            <button id="create-button" class="button primary">＋ 新建技能</button>
+          </div>
+        </header>
+
+        <section id="registry-view" class="view active">
+          <div class="metrics">
+            <article><span>可见技能</span><strong id="metric-skills">—</strong><small>权限过滤后的结果</small></article>
+            <article><span>已发布版本</span><strong id="metric-releases">—</strong><small>不可变制品</small></article>
+            <article><span>签名策略</span><strong id="metric-signature">强制</strong><small>生产环境失败关闭</small></article>
+            <article><span>部署地域</span><strong id="metric-region">上海</strong><small>华南 P95 持续实测</small></article>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><div><h2>Registry</h2><p>PostgreSQL 元数据 · COS/S3 不可变制品</p></div><span id="result-count" class="pill">0 项</span></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>技能</th><th>可见性</th><th>标签</th><th>最近更新</th><th></th></tr></thead>
+                <tbody id="skill-table"></tbody>
+              </table>
+              <div id="empty-state" class="empty hidden"><div>◇</div><h3>尚无匹配技能</h3><p>创建第一个 Skill，或调整搜索条件。</p></div>
+            </div>
+          </div>
+        </section>
+
+        <section id="publishing-view" class="view">
+          <div class="callout warning"><b>公开发布是单向操作</b><span>仅对逐版本明确授权的 public Skill 创建不可变 GitHub Release；GitHub 永不反向覆盖 Hub。</span></div>
+          <div class="panel"><div class="panel-head"><div><h2>发布流程</h2><p>隔离上传 → 扫描验签 → 审核绑定 → 固化发布 → 可选 GitHub 镜像</p></div><button id="upload-button" class="button primary">上传新版本</button></div><ol class="timeline"><li><b>Quarantine</b><span>ZIP 结构、路径、体积与秘密检测</span></li><li><b>Verified draft</b><span>SHA-256、Ed25519 与服务端清单</span></li><li><b>Review</b><span>审批证据绑定 artifact 与 manifest 摘要</span></li><li><b>Immutable release</b><span>标签 CAS、事件流及原子安装</span></li></ol></div>
+        </section>
+
+        <section id="integrations-view" class="view">
+          <div class="integration-grid" id="integration-grid"></div>
+          <div class="callout info"><b>飞书 Aily 边界</b><span>当前公共 API 支持 Skill 列表、详情与调用，不提供完整定义 CRUD；1.0 只做云端连接器与漂移映射，不承诺伪同步。</span></div>
+        </section>
+
+        <section id="settings-view" class="view">
+          <div class="settings-grid">
+            <article class="panel compact"><h2>客户端基线</h2><dl><div><dt>操作系统</dt><dd>macOS 13+</dd></div><div><dt>处理器</dt><dd>Apple Silicon</dd></div><div><dt>其他系统</dt><dd>GitHub Release 手动下载</dd></div></dl></article>
+            <article class="panel compact"><h2>治理基线</h2><dl><div><dt>管理员</dt><dd>tark5139</dd></div><div><dt>公开仓库</dt><dd>skill-hub-public</dd></div><div><dt>许可证</dt><dd>Apache-2.0</dd></div></dl></article>
+            <article class="panel compact wide"><h2>CLI 快速连接</h2><pre><code>skillctl login --url https://YOUR_DOMAIN --token YOUR_TOKEN
+skillctl search
+skillctl install personal/hello-skill --agent codex --label stable</code></pre></article>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="login-screen" class="login-screen">
+      <form id="login-form" class="login-card">
+        <div class="brand-mark large">S</div><p class="eyebrow">PERSONAL SKILL HUB</p><h2>连接私有仓库</h2><p>令牌仅保存在当前浏览器会话，不写入服务器或永久存储。</p>
+        <label>Registry URL<input id="login-url" type="url" required /></label>
+        <label>管理员令牌<input id="login-token" type="password" autocomplete="off" required /></label>
+        <button class="button primary full" type="submit">验证并进入</button><small id="login-error" class="form-error"></small>
+      </form>
+    </div>
+
+    <dialog id="create-dialog"><form id="create-form" method="dialog"><div class="dialog-head"><div><p class="eyebrow">NEW SKILL</p><h2>创建技能</h2></div><button class="icon-button close-dialog" type="button">×</button></div><div class="form-grid"><label>命名空间<input name="namespace" value="personal" pattern="[a-z0-9][a-z0-9._-]{0,62}" required /></label><label>技能名称<input name="name" placeholder="document-review" pattern="[a-z0-9][a-z0-9._-]{0,62}" required /></label><label class="span-2">说明<textarea name="description" rows="4" required></textarea></label><label>可见性<select name="visibility"><option value="private">Private（默认）</option><option value="public">Public</option></select></label><label>标签<input name="tags" placeholder="research, document" /></label></div><div class="dialog-actions"><button type="button" class="button ghost close-dialog">取消</button><button type="submit" class="button primary">创建</button></div></form></dialog>
+
+    <dialog id="upload-dialog"><form id="upload-form" method="dialog"><div class="dialog-head"><div><p class="eyebrow">QUARANTINE UPLOAD</p><h2>上传技能版本</h2></div><button class="icon-button close-dialog" type="button">×</button></div><div class="form-grid"><label class="span-2">目标技能<select id="upload-skill" name="skill_id" required></select></label><label>版本<input name="version" placeholder="1.0.0" required /></label><label>许可证<input name="license" value="Apache-2.0" required /></label><label class="span-2">兼容 Agent<input name="compatibility" value="codex,claude-code" /></label><label class="span-2 file-input">ZIP 技能包<input name="archive" type="file" accept=".zip,application/zip" required /></label><details class="span-2"><summary>Ed25519 签名（生产环境必需）</summary><div class="form-grid nested"><label>Key ID<input name="signature_key_id" /></label><label>Base64 签名<input name="signature_base64" /></label></div></details></div><div class="dialog-actions"><button type="button" class="button ghost close-dialog">取消</button><button type="submit" class="button primary">上传并进入扫描</button></div></form></dialog>
+
+    <aside id="detail-drawer" class="drawer" aria-hidden="true"><div class="drawer-head"><div><p class="eyebrow" id="detail-namespace">—</p><h2 id="detail-name">—</h2></div><button id="close-drawer" class="icon-button">×</button></div><p id="detail-description" class="muted"></p><div id="detail-meta" class="detail-meta"></div><h3>版本</h3><div id="version-list" class="version-list"></div></aside><div id="drawer-backdrop" class="backdrop"></div>
+
+    <div id="toast" class="toast" role="status"></div>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
