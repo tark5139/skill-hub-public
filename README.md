@@ -109,17 +109,16 @@ with:
 ./ops/macos/build_cli.sh
 ```
 
-Without `SKILLHUB_CODESIGN_IDENTITY`, the archive is deliberately named `*-adhoc.zip`. A Developer
-ID build remains `*-signed-unnotarized.zip` until this succeeds:
+Without `SKILLHUB_CODESIGN_IDENTITY`, the archive is deliberately named `*-adhoc.zip`. Official
+Developer ID signing, Apple's standalone-code notarization check, clean-Mac Gatekeeper acceptance,
+SHA-256 evidence, the optional stapled DMG, and the protected manual GitHub Actions path are
+documented in [`docs/macos-release.md`](docs/macos-release.md). The official local command is
+fail-closed unless its exact reviewed commit, full ref, version, Developer ID identity, Team ID,
+and notary credential are provided and the worktree is clean.
 
-```bash
-SKILLHUB_NOTARY_PROFILE=skillhub-notary \
-  ./ops/macos/notarize_cli.sh artifacts/skillctl-0.1.0-macos13-arm64-signed-unnotarized.zip
-```
-
-Only the resulting suffix-free ZIP is eligible for an official public download. The build must
-never ask users to bypass Gatekeeper. The platform-neutral Python wheel remains available under
-`dist/` for development and manual installation.
+Only a suffix-free verified artifact is eligible for an official public download. The release
+automation does not create a Git tag or GitHub Release. The platform-neutral Python wheel remains
+available under `dist/` for development and manual installation.
 
 ## Deployment
 
