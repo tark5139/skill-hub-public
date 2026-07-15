@@ -1,0 +1,15 @@
+{
+  "version": "2.0",
+  "statement": [
+    {
+      "effect": "allow",
+      "action": [
+        "name/cos:GetObject",
+        "name/cos:HeadObject"
+      ],
+      "resource": [
+        "qcs::cos:ap-shanghai:uid/REPLACE_APPID:REPLACE_BACKUP_BUCKET_WITH_APPID/postgres/*"
+      ]
+    }
+  ]
+}

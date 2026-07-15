@@ -4,6 +4,7 @@ import hashlib
 from typing import Any
 
 import boto3
+from botocore.config import Config
 from botocore.exceptions import ClientError
 
 from .base import ObjectStorage
@@ -29,6 +30,7 @@ class S3ObjectStorage(ObjectStorage):
             endpoint_url=endpoint_url,
             aws_access_key_id=access_key_id,
             aws_secret_access_key=secret_access_key,
+            config=Config(s3={"addressing_style": "virtual"}),
         )
 
     def put_quarantine(self, key: str, data: bytes) -> None:

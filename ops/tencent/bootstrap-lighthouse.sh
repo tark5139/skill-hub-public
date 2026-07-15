@@ -15,6 +15,7 @@ TRUSTED_TAG_SIGNERS_SOURCE=${TRUSTED_TAG_SIGNERS_SOURCE:-}
 TRUSTED_TAG_PUBLIC_KEY_FILE=${TRUSTED_TAG_PUBLIC_KEY_FILE:-}
 TRUSTED_TAG_SIGNERS=/etc/skill-hub/trusted-tag-signers
 TRUSTED_TAG_PUBLIC_KEYS=/etc/skill-hub/release-tag-public-keys.asc
+AWS_CONFIG=/etc/skill-hub/aws-config
 REQUIRE_COS_BACKUP_BEFORE_BOOTSTRAP=${REQUIRE_COS_BACKUP_BEFORE_BOOTSTRAP:-1}
 CONFIGURE_UFW=${CONFIGURE_UFW:-0}
 ADMIN_CIDR=${ADMIN_CIDR:-}
@@ -293,6 +294,9 @@ for required_script in common.sh backup.sh deploy.sh healthcheck.sh restore.sh r
   install -m 0750 -o root -g "$DEPLOY_GROUP" \
     "${APP_DIR}/ops/tencent/${required_script}" "${OPS_INSTALL_DIR}/${required_script}"
 done
+[[ -f ${APP_DIR}/ops/tencent/aws-config && ! -L ${APP_DIR}/ops/tencent/aws-config ]] || \
+  fail 'verified release lacks a regular ops/tencent/aws-config file'
+install -m 0644 -o root -g root "${APP_DIR}/ops/tencent/aws-config" "$AWS_CONFIG"
 
 if [[ ! -e ${APP_DIR}/.env ]]; then
   install -m 0600 -o "$DEPLOY_USER" -g "$DEPLOY_GROUP" /dev/null "${APP_DIR}/.env"

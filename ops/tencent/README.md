@@ -24,11 +24,16 @@ They do not create cloud resources, modify Tencent security groups, or contain c
   Asia/Shanghai, with persistent catch-up and up to ten minutes of randomized delay. Bootstrap does
   not activate them before backup credentials and one manual backup have been verified; follow the
   operator runbook to install and enable them.
+- `aws-config`: non-secret AWS CLI/botocore configuration that forces Tencent COS virtual-host
+  addressing; bootstrap installs it root-owned as `/etc/skill-hub/aws-config`.
 - `restore.sh`: verifies a portable checksum, recreates the database, restores, migrates, then and
   only then starts API/Worker; any restore or migration failure leaves services stopped.
 - `common.sh`: shared safe `.env` parsing, portable checksum verification, and exclusive `flock`
   helpers used by the operational commands.
 - `cam-policy-application.json` and `cam-policy-backup.json`: replaceable least-privilege CAM
   templates scoped to the exact Shanghai buckets/prefixes used by the workload.
+- `cam-policy-backup-restore.json`: break-glass `HeadObject`/`GetObject` access for the exact
+  backup prefix. Keep it detached from the daily writer; attach it only for an approved restore
+  drill or incident and remove the association immediately after verified download.
 
 The operator runbook is `docs/deployment-tencent-shanghai-mvp.md`.

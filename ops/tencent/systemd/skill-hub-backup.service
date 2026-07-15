@@ -12,6 +12,11 @@ Group=root
 UMask=0077
 Environment="REQUIRE_COS_BACKUP=1"
 Environment="BACKUP_ENV_FILE=/etc/skill-hub/backup.env"
+Environment="AWS_CONFIG_FILE=/etc/skill-hub/aws-config"
+Environment="AWS_EC2_METADATA_DISABLED=true"
+# Prefer the snap's direct AWS CLI entrypoint. /snap/bin/aws invokes snapd and
+# attempts to create /root/snap, which is intentionally blocked by ProtectHome.
+Environment="PATH=/snap/aws-cli/current/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
 ExecStart=/usr/local/lib/skill-hub-ops/backup.sh
 SyslogIdentifier=skill-hub-backup
 NoNewPrivileges=true
