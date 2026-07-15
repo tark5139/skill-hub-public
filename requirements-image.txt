@@ -1,0 +1,16 @@
+# Direct production and image-build requirements. Exact versions and all
+# transitive dependencies are frozen by constraints.txt.
+alembic
+boto3
+cryptography
+fastapi
+hatchling
+httpx
+packaging
+psycopg[binary]
+pydantic-settings
+python-multipart
+PyYAML
+sqlalchemy
+typer
+uvicorn[standard]

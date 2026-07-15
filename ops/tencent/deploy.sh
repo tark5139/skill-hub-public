@@ -69,6 +69,10 @@ trap 'exit 143' TERM
 [[ ${TARGET_TAG} != -* ]] || fail 'deployment tag must not begin with a hyphen'
 /usr/bin/git check-ref-format "refs/tags/${TARGET_TAG}" >/dev/null 2>&1 || \
   fail 'deployment target must be one exact tag name; commits and branches are refused'
+[[ ${TARGET_TAG} =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]] || \
+  fail 'deployment tag must use the stable vMAJOR.MINOR.PATCH form'
+SKILLHUB_IMAGE_TAG=${BASH_REMATCH[1]}
+export SKILLHUB_IMAGE_TAG
 [[ -d ${APP_DIR}/.git ]] || fail "${APP_DIR} is not a Git checkout"
 [[ -f ${APP_DIR}/.env && ! -L ${APP_DIR}/.env && -s ${APP_DIR}/.env ]] || \
   fail "${APP_DIR}/.env must be a non-empty, regular, non-symlink file"
