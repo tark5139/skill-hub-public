@@ -110,7 +110,7 @@ def test_cli_accepts_documented_aliases_and_compact_skill_reference(
 
     version = runner.invoke(app, ["--version"])
     assert version.exit_code == 0
-    assert version.output.strip() == "0.1.2"
+    assert version.output.strip() == "0.1.3"
 
 
 def test_cli_help_exposes_required_lifecycle_commands() -> None:

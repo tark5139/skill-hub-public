@@ -11,6 +11,8 @@ def test_production_image_build_is_pinned_cached_and_offline_for_local_package()
     first_line = dockerfile.splitlines()[0]
     assert first_line.startswith("FROM python:3.12-slim-bookworm@sha256:")
     assert len(first_line.rsplit("@sha256:", 1)[1]) == 64
+    assert "apt-get" not in dockerfile
+    assert "already contains the system CA bundle" in dockerfile
     assert "--mount=type=cache,target=/root/.cache/pip" in dockerfile
     assert "--retries 8 --timeout 60 --only-binary=:all:" in dockerfile
     assert dockerfile.index("COPY constraints.txt requirements-image.txt") < dockerfile.index(
