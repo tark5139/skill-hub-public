@@ -45,7 +45,7 @@ def create_app(
 
     app = FastAPI(
         title="Personal Skill Hub Registry API",
-        version="0.1.0",
+        version="0.1.1",
         description=(
             "Private-first immutable Agent Skill registry. Errors use RFC 9457 Problem Details."
         ),
