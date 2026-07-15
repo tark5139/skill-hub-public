@@ -8,11 +8,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_DEFAULT_TIMEOUT=60
 
+# The pinned official Python image already contains the system CA bundle.
 RUN groupadd --gid "${APP_GID}" skillhub \
-    && useradd --uid "${APP_UID}" --gid "${APP_GID}" --create-home skillhub \
-    && apt-get update \
-    && apt-get install --yes --no-install-recommends ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+    && useradd --uid "${APP_UID}" --gid "${APP_GID}" --create-home skillhub
 
 WORKDIR /app
 
