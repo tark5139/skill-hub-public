@@ -112,6 +112,10 @@ fi
 [[ ${TARGET_TAG} != -* ]] || fail 'rollback tag must not begin with a hyphen'
 /usr/bin/git check-ref-format "refs/tags/${TARGET_TAG}" >/dev/null 2>&1 || \
   fail 'rollback target must be one exact tag name; commit IDs and branches are refused'
+[[ ${TARGET_TAG} =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]] || \
+  fail 'rollback tag must use the stable vMAJOR.MINOR.PATCH form'
+SKILLHUB_IMAGE_TAG=${BASH_REMATCH[1]}
+export SKILLHUB_IMAGE_TAG
 
 api_ids=$(skillhub_container_ids "$COMPOSE_PROJECT_NAME" api)
 worker_ids=$(skillhub_container_ids "$COMPOSE_PROJECT_NAME" worker)

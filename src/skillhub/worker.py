@@ -50,7 +50,7 @@ def record_heartbeat(session_factory: sessionmaker[Session]) -> None:
             heartbeat = WorkerHeartbeat(worker_id="default", last_seen_at=datetime.now(UTC))
             session.add(heartbeat)
         heartbeat.last_seen_at = datetime.now(UTC)
-        heartbeat.details_json = {"component": "registry-worker", "version": "0.1.1"}
+        heartbeat.details_json = {"component": "registry-worker", "version": "0.1.2"}
         session.commit()
 
 

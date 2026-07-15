@@ -3,7 +3,7 @@ name: personal-skill-hub
 x-skillhub-common: &skillhub-common
   build:
     context: .
-  image: personal-skill-hub:0.1.0
+  image: personal-skill-hub:${SKILLHUB_IMAGE_TAG:-dev}
   env_file:
     - .env
   environment: &skillhub-environment
