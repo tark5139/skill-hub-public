@@ -71,6 +71,9 @@ skillctl status
 skillctl doctor
 ```
 
+The Codex adapter installs Skills into `~/.codex/skills` by default. Use `--root` only when an
+explicit nonstandard Codex Skill directory is required.
+
 The installer downloads into a temporary directory, verifies manifest and artifact digests, rejects
 unsafe ZIP paths, compares the managed baseline with local changes, creates a backup, and then uses
 an atomic rename. Remote and local concurrent changes become an explicit conflict; they are never

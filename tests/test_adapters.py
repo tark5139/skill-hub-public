@@ -17,7 +17,7 @@ from skillhub.adapters import (
 
 def test_local_adapter_roots_are_home_injectable(tmp_path: Path) -> None:
     expected = {
-        "codex": tmp_path / ".agents/skills",
+        "codex": tmp_path / ".codex/skills",
         "claude-code": tmp_path / ".claude/skills",
         "trae-cn": tmp_path / ".trae-cn/skills",
         "openclaw": tmp_path / ".openclaw/skills",
