@@ -110,7 +110,7 @@ def test_atomic_install_update_rollback_status_and_uninstall(tmp_path: Path) -> 
     installer = SkillInstaller(registry, home=tmp_path)  # type: ignore[arg-type]
 
     installed = installer.install("personal", "demo", agent="codex")
-    destination = tmp_path / ".agents/skills/demo"
+    destination = tmp_path / ".codex/skills/demo"
     assert installed["action"] == "installed"
     assert destination.is_dir()
     assert installer.status()[0]["observation"]["status"] == "clean"
@@ -143,7 +143,7 @@ def test_update_refuses_local_changes_and_force_preserves_them_offline(tmp_path:
     registry.stable = "1.0.0"
     installer = SkillInstaller(registry, home=tmp_path)  # type: ignore[arg-type]
     installer.install("personal", "demo", agent="codex")
-    destination = tmp_path / ".agents/skills/demo"
+    destination = tmp_path / ".codex/skills/demo"
     (destination / "SKILL.md").write_text("local edit", encoding="utf-8")
     registry.stable = "2.0.0"
 
@@ -157,7 +157,7 @@ def test_update_refuses_local_changes_and_force_preserves_them_offline(tmp_path:
 
 def test_unmanaged_destination_is_not_overwritten_without_force(tmp_path: Path) -> None:
     registry = FakeRegistry([make_release("1.0.0", "first")])
-    destination = tmp_path / ".agents/skills/demo"
+    destination = tmp_path / ".codex/skills/demo"
     destination.mkdir(parents=True)
     (destination / "SKILL.md").write_text("unmanaged", encoding="utf-8")
     installer = SkillInstaller(registry, home=tmp_path)  # type: ignore[arg-type]
@@ -205,7 +205,7 @@ def test_manifest_digest_is_checked_before_validation_or_extraction(
     installer = SkillInstaller(FakeRegistry([release]), home=tmp_path)  # type: ignore[arg-type]
     with pytest.raises(IntegrityError, match="Manifest SHA-256 mismatch"):
         installer.install("personal", "demo", agent="codex")
-    assert not (tmp_path / ".agents/skills/demo").exists()
+    assert not (tmp_path / ".codex/skills/demo").exists()
 
 
 def test_manifest_canonical_digest_excludes_storage_newline() -> None:

@@ -10,7 +10,7 @@ from .base import AgentAdapter
 class CodexAdapter(AgentAdapter):
     adapter_id = "codex"
     display_name = "OpenAI Codex"
-    relative_root = Path(".agents/skills")
+    relative_root = Path(".codex/skills")
     executable = "codex"
 
 
