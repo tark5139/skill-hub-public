@@ -33,7 +33,7 @@ psycopg-binary==3.3.4
 pycparser==3.0
 pydantic==2.13.4
 pydantic-settings==2.14.2
-pydantic_core==2.46.4
+pydantic_core==2.47.0
 Pygments==2.20.0
 pyinstaller==6.21.0
 pyinstaller-hooks-contrib==2026.6
