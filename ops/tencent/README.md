@@ -24,6 +24,8 @@ They do not create cloud resources, modify Tencent security groups, or contain c
   Asia/Shanghai, with persistent catch-up and up to ten minutes of randomized delay. Bootstrap does
   not activate them before backup credentials and one manual backup have been verified; follow the
   operator runbook to install and enable them.
+- `aws-config`: non-secret AWS CLI/botocore configuration that forces Tencent COS virtual-host
+  addressing; bootstrap installs it root-owned as `/etc/skill-hub/aws-config`.
 - `restore.sh`: verifies a portable checksum, recreates the database, restores, migrates, then and
   only then starts API/Worker; any restore or migration failure leaves services stopped.
 - `common.sh`: shared safe `.env` parsing, portable checksum verification, and exclusive `flock`

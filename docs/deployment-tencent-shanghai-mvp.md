@@ -284,6 +284,8 @@ DEPLOY_GROUP=$(id -gn)
 sudo install -d -m 0750 -o root -g "$DEPLOY_GROUP" /etc/skill-hub
 sudo install -m 0640 -o root -g "$DEPLOY_GROUP" \
   ops/tencent/backup.env.example /etc/skill-hub/backup.env
+sudo install -m 0644 -o root -g root \
+  ops/tencent/aws-config /etc/skill-hub/aws-config
 sudoedit /etc/skill-hub/backup.env
 ```
 
@@ -301,6 +303,8 @@ sudo BACKUP_ENV_FILE=/etc/skill-hub/backup.env \
 ```sh
 sudo REQUIRE_COS_BACKUP=1 BACKUP_ENV_FILE=/etc/skill-hub/backup.env \
   /usr/local/lib/skill-hub-ops/backup.sh
+sudo install -m 0644 -o root -g root \
+  ops/tencent/aws-config /etc/skill-hub/aws-config
 sudo install -m 0644 -o root -g root \
   ops/tencent/systemd/skill-hub-backup.service \
   ops/tencent/systemd/skill-hub-backup.timer \
