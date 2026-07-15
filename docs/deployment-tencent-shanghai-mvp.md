@@ -327,6 +327,11 @@ sudo journalctl -u skill-hub-backup.service --since today --no-pager
 
 不要用 cron 重复调度同一脚本。修改模板后必须通过已签名发布和运维控制面升级流程重新安装，再执行 `systemctl daemon-reload`；不要直接在线编辑 `/etc/systemd/system` 中的审计基线。
 
+日常备份 CAM 身份应保持仅写。另用 `ops/tencent/cam-policy-backup-restore.json` 创建
+break-glass 策略，只授予备份桶 `postgres/*` 的 `HeadObject` 与 `GetObject`，不授予
+`ListBucket`、写入或删除。经批准的恢复演练开始时临时关联该策略，按精确对象名下载
+dump 与 checksum 并校验；演练完成后立即解除关联，并再验证读取已返回 `AccessDenied`。
+
 至少每月执行一次异机恢复演练。下载备份后先独立核对 checksum，再在维护窗口显式确认恢复：
 
 ```sh

@@ -32,5 +32,8 @@ They do not create cloud resources, modify Tencent security groups, or contain c
   helpers used by the operational commands.
 - `cam-policy-application.json` and `cam-policy-backup.json`: replaceable least-privilege CAM
   templates scoped to the exact Shanghai buckets/prefixes used by the workload.
+- `cam-policy-backup-restore.json`: break-glass `HeadObject`/`GetObject` access for the exact
+  backup prefix. Keep it detached from the daily writer; attach it only for an approved restore
+  drill or incident and remove the association immediately after verified download.
 
 The operator runbook is `docs/deployment-tencent-shanghai-mvp.md`.

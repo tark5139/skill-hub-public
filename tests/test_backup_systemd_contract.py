@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SYSTEMD_DIR = ROOT / "ops" / "tencent" / "systemd"
 AWS_CONFIG = ROOT / "ops" / "tencent" / "aws-config"
 BOOTSTRAP = ROOT / "ops" / "tencent" / "bootstrap-lighthouse.sh"
+RESTORE_POLICY = ROOT / "ops" / "tencent" / "cam-policy-backup-restore.json"
 
 
 def test_backup_service_uses_stable_root_owned_operation_and_requires_cos() -> None:
@@ -54,3 +56,19 @@ def test_bootstrap_installs_the_verified_aws_config() -> None:
         'install -m 0644 -o root -g root "${APP_DIR}/ops/tencent/aws-config" '
         '"$AWS_CONFIG"' in bootstrap
     )
+
+
+def test_backup_restore_policy_is_exact_prefix_read_only() -> None:
+    policy = json.loads(RESTORE_POLICY.read_text(encoding="utf-8"))
+    statement = policy["statement"]
+
+    assert len(statement) == 1
+    assert statement[0]["effect"] == "allow"
+    assert set(statement[0]["action"]) == {
+        "name/cos:GetObject",
+        "name/cos:HeadObject",
+    }
+    assert statement[0]["resource"] == [
+        "qcs::cos:ap-shanghai:uid/REPLACE_APPID:"
+        "REPLACE_BACKUP_BUCKET_WITH_APPID/postgres/*"
+    ]
