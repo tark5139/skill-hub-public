@@ -36,7 +36,7 @@ Issues = "https://github.com/tark5139/skill-hub-public/issues"
 dev = [
   "build>=1.2,<2",
   "pyinstaller>=6.11,<7; sys_platform == 'darwin' and platform_machine == 'arm64'",
-  "pytest>=8.3,<9",
+  "pytest>=8.3,<10",
   "pytest-cov>=6,<8",
   "ruff>=0.9,<1",
 ]
