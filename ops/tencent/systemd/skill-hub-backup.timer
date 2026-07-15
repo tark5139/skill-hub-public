@@ -1,0 +1,13 @@
+[Unit]
+Description=Run the Skill Hub PostgreSQL and COS backup each day
+Documentation=https://github.com/tark5139/skill-hub-public/blob/main/docs/deployment-tencent-shanghai-mvp.md
+
+[Timer]
+OnCalendar=*-*-* 02:15:00 Asia/Shanghai
+Persistent=true
+RandomizedDelaySec=10m
+AccuracySec=1m
+Unit=skill-hub-backup.service
+
+[Install]
+WantedBy=timers.target
