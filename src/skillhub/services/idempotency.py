@@ -21,9 +21,13 @@ def lock_key(session: Session, *, principal_id: str, key: str | None) -> None:
 
     if not key or not session.bind or session.bind.dialect.name != "postgresql":
         return
+    # PostgreSQL text values cannot contain NUL bytes. Hash a canonical tuple first so
+    # untrusted principal/key text is always valid SQL text while preserving an
+    # unambiguous lock identity.
+    lock_value = request_digest({"principal_id": principal_id, "key": key})
     session.execute(
         text("SELECT pg_advisory_xact_lock(hashtextextended(:lock_value, 0))"),
-        {"lock_value": f"{principal_id}\x00{key}"},
+        {"lock_value": lock_value},
     )
 
 
