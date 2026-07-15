@@ -19,6 +19,11 @@ They do not create cloud resources, modify Tencent security groups, or contain c
 - `backup.sh` and `backup.env.example`: use Docker labels to dump the running PostgreSQL container
   without executing application-tree code, then optionally copy verified dumps to a separate COS
   bucket with a separate identity.
+- `systemd/skill-hub-backup.service` and `systemd/skill-hub-backup.timer`: auditable root-owned
+  templates that require the COS copy and run the stable backup operation daily at 02:15
+  Asia/Shanghai, with persistent catch-up and up to ten minutes of randomized delay. Bootstrap does
+  not activate them before backup credentials and one manual backup have been verified; follow the
+  operator runbook to install and enable them.
 - `restore.sh`: verifies a portable checksum, recreates the database, restores, migrates, then and
   only then starts API/Worker; any restore or migration failure leaves services stopped.
 - `common.sh`: shared safe `.env` parsing, portable checksum verification, and exclusive `flock`

@@ -1,0 +1,21 @@
+[Unit]
+Description=Skill Hub verified PostgreSQL and COS backup
+Documentation=https://github.com/tark5139/skill-hub-public/blob/main/docs/deployment-tencent-shanghai-mvp.md
+Wants=network-online.target
+After=network-online.target docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+UMask=0077
+Environment="REQUIRE_COS_BACKUP=1"
+Environment="BACKUP_ENV_FILE=/etc/skill-hub/backup.env"
+ExecStart=/usr/local/lib/skill-hub-ops/backup.sh
+SyslogIdentifier=skill-hub-backup
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/backups/skill-hub/postgres /var/lock/skill-hub

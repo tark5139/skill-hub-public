@@ -35,6 +35,7 @@ flowchart LR
 | `healthcheck.sh` | 重试本地或 HTTPS 的 live/ready 探针 |
 | `rollback.sh` | 仅回滚应用代码，不自动执行危险的数据库降级 |
 | `backup.sh`、`backup.env.example` | 不执行应用目录代码，按 Docker label 直接备份当前 PostgreSQL 并可复制到独立 COS 桶 |
+| `systemd/skill-hub-backup.service`、`systemd/skill-hub-backup.timer` | 每日 02:15（Asia/Shanghai）强制执行本地与 COS 备份的 systemd 模板 |
 | `restore.sh` | 校验备份、重建数据库、恢复并迁移成功后才启动服务 |
 | `common.sh` | 安全读取指定 `.env` 字段、可移植 checksum 与独占运维锁 |
 | `trusted-tag-signers.example` | root-owned 发布签名者完整 OpenPGP 指纹白名单示例；不包含公钥材料 |
@@ -295,12 +296,32 @@ sudo BACKUP_ENV_FILE=/etc/skill-hub/backup.env \
 
 稳定版备份脚本不 source、调用或执行目标 Git 工作树中的任何脚本或 Compose 文件；它按固定 Compose label 找到唯一运行中的 PostgreSQL 容器，执行 `pg_dump` custom format，先写 `.partial`，完成后原子改名。checksum 仅记录备份文件 basename，便于移动；校验成功后才将 dump 与 checksum 以服务端加密方式复制到独立 COS 桶。默认本地保留 14 天，直接运行时可设置 `REQUIRE_COS_BACKUP=1` 强制异机复制成功。
 
-建议由 root cron 每日执行，并把成功/失败接入现有告警系统：
+先以与定时任务完全相同的强制 COS 模式人工验证一次；只有本地 checksum 和 COS 上传都成功，才安装并启动随仓库提供的 systemd 单元：
 
-```cron
-PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-15 2 * * * REQUIRE_COS_BACKUP=1 BACKUP_ENV_FILE=/etc/skill-hub/backup.env /usr/local/lib/skill-hub-ops/backup.sh
+```sh
+sudo REQUIRE_COS_BACKUP=1 BACKUP_ENV_FILE=/etc/skill-hub/backup.env \
+  /usr/local/lib/skill-hub-ops/backup.sh
+sudo install -m 0644 -o root -g root \
+  ops/tencent/systemd/skill-hub-backup.service \
+  ops/tencent/systemd/skill-hub-backup.timer \
+  /etc/systemd/system/
+sudo systemd-analyze verify \
+  /etc/systemd/system/skill-hub-backup.service \
+  /etc/systemd/system/skill-hub-backup.timer
+sudo systemctl daemon-reload
+sudo systemctl enable --now skill-hub-backup.timer
+systemctl list-timers skill-hub-backup.timer --all
 ```
+
+定时器按 `Asia/Shanghai` 每日 02:15 触发，`Persistent=true` 会在主机错过计划时间后补跑，`RandomizedDelaySec=10m` 避免固定时刻争用资源。服务设置 `UMask=0077`，固定调用 root-owned `/usr/local/lib/skill-hub-ops/backup.sh`，并强制 `REQUIRE_COS_BACKUP=1`；它不会从 Git 工作树执行脚本，也不会把凭据写进 systemd 单元。首次启用后应手动启动并核对 journal，随后把非零退出状态接入告警系统：
+
+```sh
+sudo systemctl start skill-hub-backup.service
+sudo systemctl status skill-hub-backup.service --no-pager
+sudo journalctl -u skill-hub-backup.service --since today --no-pager
+```
+
+不要用 cron 重复调度同一脚本。修改模板后必须通过已签名发布和运维控制面升级流程重新安装，再执行 `systemctl daemon-reload`；不要直接在线编辑 `/etc/systemd/system` 中的审计基线。
 
 至少每月执行一次异机恢复演练。下载备份后先独立核对 checksum，再在维护窗口显式确认恢复：
 
