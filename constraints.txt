@@ -45,7 +45,7 @@ python-dotenv==1.2.2
 python-multipart==0.0.32
 PyYAML==6.0.3
 rich==15.0.0
-ruff==0.15.21
+ruff==0.15.22
 s3transfer==0.19.1
 setuptools==83.0.0
 shellingham==1.5.4
